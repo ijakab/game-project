@@ -1,0 +1,25 @@
+version: "3.1"
+
+services:
+  postgres_game:
+    image: postgres:13
+    container_name: postgres_game
+    volumes:
+      - postgres_game_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - 5432:5432
+
+  redis_game:
+    image: redis:6-alpine
+    container_name: redis_game
+    volumes:
+      - redis_game_volume:/data
+    ports:
+      - 6379:6379
+
+volumes:
+  redis_game_volume:
+  postgres_game_volume:
