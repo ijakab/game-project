@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GameModule } from './game/game.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GraphQLModule } from '@nestjs/graphql';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -15,7 +17,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: process.env.PG_DATABASE || 'postgres',
       entities: [],
       synchronize: true,
-      autoLoadEntities: true
+      autoLoadEntities: true,
+    }),
+    GraphQLModule.forRoot({
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     GameModule,
   ],
