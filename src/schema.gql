@@ -2,11 +2,22 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type GameDto {
+type ReadGameDto {
   id: String!
-  test: String!
+  type: String!
+  play_as: String!
+  state: [[String!]!]!
 }
 
 type Query {
-  getGame(id: String!): GameDto!
+  getGame(id: String!): ReadGameDto!
+}
+
+type Mutation {
+  initGame(config: SaveGameDto!): ReadGameDto!
+}
+
+input SaveGameDto {
+  type: String!
+  play_as: String!
 }

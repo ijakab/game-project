@@ -1,20 +1,29 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
-import { InjectRepository } from '@nestjs/typeorm';
-import { GameEntity } from './game.entity';
-import { Repository } from 'typeorm';
-import { GameDto } from './game.dto';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { ReadGameDto } from './dto/read-game.dto';
+import { GameService } from './game.service';
+import { FieldValue } from './enum/field-value.enum';
+import { GameType } from './enum/game-type.enum';
+import { GameLogic } from './logic/game-logic';
+import { SaveGameDto } from './dto/save-game.dto';
 
-@Resolver((of) => GameDto)
+@Resolver((of) => ReadGameDto)
 export class GameResolver {
-  constructor(
-    @InjectRepository(GameEntity)
-    private _gameRepository: Repository<GameEntity>,
-  ) {}
+  constructor(private gameService: GameService) {}
 
-  @Query((returns) => GameDto)
-  async getGame(@Args('id') id: string) {
-    return this._gameRepository.findOne({
-      id: id,
-    });
+  @Query((returns) => ReadGameDto)
+  getGame(@Args('id') id: string): ReadGameDto {
+    return {
+      id: 'test',
+      play_as: FieldValue.O,
+      type: GameType.Multi,
+      state: [],
+    };
+  }
+
+  @Mutation((returns) => ReadGameDto)
+  async initGame(
+    @Args({ name: 'config', type: () => SaveGameDto }) dto: ReadGameDto,
+  ): Promise<ReadGameDto> {
+    return this.gameService.initGame(dto);
   }
 }
