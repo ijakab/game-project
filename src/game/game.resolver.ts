@@ -1,10 +1,12 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { ReadGameDto } from './dto/read-game.dto';
 import { GameService } from './game.service';
 import { FieldValue } from './enum/field-value.enum';
 import { GameType } from './enum/game-type.enum';
-import { GameLogic } from './logic/game-logic';
 import { SaveGameDto } from './dto/save-game.dto';
+import { PubSub } from 'graphql-subscriptions';
+
+const pubSub = new PubSub();
 
 @Resolver((of) => ReadGameDto)
 export class GameResolver {
@@ -24,6 +26,18 @@ export class GameResolver {
   async initGame(
     @Args({ name: 'config', type: () => SaveGameDto }) dto: ReadGameDto,
   ): Promise<ReadGameDto> {
-    return this.gameService.initGame(dto);
+    const res = await this.gameService.initGame(dto);
+    await pubSub.publish('gameInitialized', { gameInitialized: res });
+    return res;
+  }
+
+  @Subscription((returns) => ReadGameDto, {
+    name: 'gameInitialized',
+    filter: (payload, variables) => {
+      return payload.gameInitialized.id === variables.id;
+    },
+  })
+  gameInitialized(@Args('id') id: string) {
+    return pubSub.asyncIterator('gameInitialized');
   }
 }

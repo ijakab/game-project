@@ -21,3 +21,7 @@ input SaveGameDto {
   type: String!
   play_as: String!
 }
+
+type Subscription {
+  gameInitialized(id: String!): ReadGameDto!
+}
