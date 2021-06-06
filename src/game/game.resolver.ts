@@ -5,6 +5,7 @@ import { FieldValue } from './enum/field-value.enum';
 import { GameType } from './enum/game-type.enum';
 import { SaveGameDto } from './dto/save-game.dto';
 import { PubSub } from 'graphql-subscriptions';
+import { GraphQLString } from 'graphql';
 
 const pubSub = new PubSub();
 
@@ -19,15 +20,19 @@ export class GameResolver {
       play_as: FieldValue.O,
       type: GameType.Multi,
       state: [],
+      player_one: 'test1',
+      player_two: 'test2',
     };
   }
 
   @Mutation((returns) => ReadGameDto)
   async initGame(
     @Args({ name: 'config', type: () => SaveGameDto }) dto: ReadGameDto,
+    @Args({ name: 'player', type: () => GraphQLString }) player: string,
   ): Promise<ReadGameDto> {
-    const res = await this.gameService.initGame(dto);
+    const res = await this.gameService.initGame(dto, player);
     await pubSub.publish('gameInitialized', { gameInitialized: res });
+    console.log(res);
     return res;
   }
 

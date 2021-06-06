@@ -7,6 +7,8 @@ type ReadGameDto {
   type: String!
   play_as: String!
   state: [[String!]!]!
+  player_one: String!
+  player_two: String
 }
 
 type Query {
@@ -14,7 +16,7 @@ type Query {
 }
 
 type Mutation {
-  initGame(config: SaveGameDto!): ReadGameDto!
+  initGame(player: String!, config: SaveGameDto!): ReadGameDto!
 }
 
 input SaveGameDto {

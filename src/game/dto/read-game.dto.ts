@@ -1,7 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { GameType } from '../enum/game-type.enum';
 import { FieldValue } from '../enum/field-value.enum';
-import { GraphQLObjectType, GraphQLString } from 'graphql';
+import { GraphQLString } from 'graphql';
+import { GameState } from '../types';
 
 @ObjectType()
 export class ReadGameDto {
@@ -15,5 +16,11 @@ export class ReadGameDto {
   play_as: FieldValue;
 
   @Field((type) => [[GraphQLString]])
-  state: FieldValue[][];
+  state: GameState;
+
+  @Field()
+  player_one: string;
+
+  @Field({ nullable: true })
+  player_two?: string;
 }

@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { GameType } from './enum/game-type.enum';
 import { FieldValue } from './enum/field-value.enum';
+import { GameState } from './types';
 
 @Entity()
 export class GameEntity {
@@ -14,5 +15,11 @@ export class GameEntity {
   play_as: FieldValue;
 
   @Column({ type: 'jsonb', nullable: true })
-  state: FieldValue[][];
+  state: GameState;
+
+  @Column()
+  player_one: string;
+
+  @Column({ nullable: true })
+  player_two: string;
 }
