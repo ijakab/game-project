@@ -65,7 +65,7 @@ export class GameService {
   ): Promise<ReadGameDto> {
     const gameEntity = await this.gameSaver.fetchGame(gameId);
     if (gameEntity.player_one !== player && gameEntity.player_two !== player)
-      throw new ForbiddenException({ gameId }, 'error.notInTheGame');
+      throw new ForbiddenException({ message: 'error.notInTheGame' });
     const playerSide = this.getPlayerSide(player, gameEntity);
 
     const game = Game.loadGameFromState(gameEntity, gameEntity.state);
@@ -73,6 +73,8 @@ export class GameService {
     game.makeMoveIfNeeded();
 
     gameEntity.state = game.getState();
+    gameEntity.is_over = game.isOver();
+    gameEntity.won_by = game.wonBy();
     await this.gameSaver.saveGame(gameEntity);
     return gameEntity;
   }

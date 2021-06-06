@@ -6,6 +6,8 @@ import { gameUtils } from '../utils';
 
 export class GameStateHandler {
   public turnOf: FieldValue;
+  public isOver = false;
+  public wonBy: FieldValue = null;
   private counter = {
     [FieldValue.O]: 0,
     [FieldValue.X]: 0,
@@ -42,15 +44,46 @@ export class GameStateHandler {
 
   public setValue(coordinates: GameCoordinatesDto, value: FieldValue) {
     this.state[coordinates.row][coordinates.col] = value;
-    this.turnOf = gameUtils.toggleFieldValue(this.turnOf);
     this.counter[this.turnOf]++;
+
+    if (this.isWinningMove(coordinates, value)) {
+      this.isOver = true;
+      this.wonBy = value;
+    } else if (this.isFull()) {
+      this.isOver = true;
+    }
+    this.turnOf = gameUtils.toggleFieldValue(this.turnOf);
   }
 
   public getValue(coordinates: GameCoordinatesDto) {
     return this.state[coordinates.row][coordinates.col];
   }
 
+  public isFull() {
+    let full = true;
+    this.iterateOverState(val => {
+      if (val) full = false;
+    });
+    return full;
+  }
+
+  public isWinningMove(coordinates: GameCoordinatesDto, side: FieldValue): boolean {
+    const valuesInRow = this.state[coordinates.row].filter((v) => v === side);
+    const valuesInCol = this.state.map((row) => row[coordinates.col]).filter(v => v === side);
+    if (valuesInRow.length === this.state.length || valuesInCol.length === this.state.length) return true;
+    if (coordinates.row === coordinates.col) {
+      let diagonalOne = true, diagonalTwo = true;
+      for (let i = 0; i < this.state.length; i++) {
+        if (this.state[i][i] !== side) diagonalOne = false;
+        if (this.state[i][this.state.length - i - 1] !== side) diagonalTwo = false;
+      }
+      if (diagonalOne || diagonalTwo) return true;
+    }
+    return false;
+  }
+
   private iterateOverState(callback) {
+    // todo refactor to generator
     for (const row of this.state) {
       for (const col of row) {
         callback(col);

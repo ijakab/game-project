@@ -39,22 +39,35 @@ export class Game {
   }
 
   public makeMoveIfNeeded(): void {
+    if (this.stateHandler.isOver) return;
     if (this.gamePlaysAs !== this.stateHandler.turnOf) return;
     this.makeMove();
   }
 
   public makeMove(): void {
-    const position = this.ai.getMove(this.stateHandler.getState(), this.gamePlaysAs);
+    const position = this.ai.getMove(
+      this.stateHandler.getState(),
+      this.gamePlaysAs,
+    );
     this.stateHandler.setValue(position, this.gamePlaysAs);
   }
 
   public playerMove(side: FieldValue, coordinates: GameCoordinatesDto): void {
+    if (this.stateHandler.isOver) throw new ForbiddenException({ message: 'error.gameOver' });
     if (side !== this.stateHandler.turnOf)
-      throw new ForbiddenException({}, 'error.notYourTurn');
+      throw new ForbiddenException({ message: 'error.notYourTurn' });
     const currentValue = this.stateHandler.getValue(coordinates);
     if (currentValue !== FieldValue.Empty)
-      throw new ForbiddenException({}, 'error.invalidCoordinates');
+      throw new ForbiddenException({ message: 'error.invalidCoordinates' });
 
     this.stateHandler.setValue(coordinates, side);
+  }
+
+  public wonBy(): FieldValue {
+    return this.stateHandler.wonBy;
+  }
+
+  public isOver(): boolean {
+    return this.stateHandler.isOver;
   }
 }

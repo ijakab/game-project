@@ -22,4 +22,10 @@ export class GameEntity {
 
   @Column({ nullable: true })
   player_two: string;
+
+  @Column({ nullable: true, default: false })
+  is_over: boolean;
+
+  @Column({ nullable: true })
+  won_by: FieldValue;
 }

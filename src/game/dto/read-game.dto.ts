@@ -23,4 +23,10 @@ export class ReadGameDto {
 
   @Field({ nullable: true })
   player_two?: string;
+
+  @Field({ nullable: true, defaultValue: false })
+  is_over?: boolean;
+
+  @Field({ nullable: true })
+  won_by?: FieldValue;
 }

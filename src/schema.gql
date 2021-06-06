@@ -9,6 +9,8 @@ type ReadGameDto {
   state: [[String!]!]!
   player_one: String!
   player_two: String
+  is_over: Boolean
+  won_by: String
 }
 
 type Query {
