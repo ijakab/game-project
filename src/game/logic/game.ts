@@ -5,13 +5,16 @@ import { AI } from './ai/ai.interface';
 import { RandomAi } from './ai/random.ai';
 import { GameCoordinatesDto } from '../dto/game-coordinates.dto';
 import { ForbiddenException } from '@nestjs/common';
+import { gameUtils } from '../utils';
 
 export class Game {
   private ai: AI = new RandomAi();
   private gamePlaysAs: FieldValue;
   private turnOf: FieldValue;
-  private numOfX = 0;
-  private numOfO = 0;
+  private counter = {
+    [FieldValue.O]: 0,
+    [FieldValue.X]: 0,
+  };
 
   private state: GameState = [
     [FieldValue.Empty, FieldValue.Empty, FieldValue.Empty],
@@ -42,10 +45,14 @@ export class Game {
         this.config.play_as === FieldValue.O ? FieldValue.X : FieldValue.O;
     }
     this.iterateOverState((value) => {
-      if (value === FieldValue.O) this.numOfO++;
-      if (value === FieldValue.X) this.numOfX++;
+      if (value !== FieldValue.Empty) {
+        this.counter[value]++;
+      }
     });
-    this.turnOf = this.numOfX <= this.numOfO ? FieldValue.X : FieldValue.O;
+    this.turnOf =
+      this.counter[FieldValue.X] <= this.counter[FieldValue.O]
+        ? FieldValue.X
+        : FieldValue.O;
   }
 
   private iterateOverState(callback) {
@@ -79,5 +86,7 @@ export class Game {
       throw new ForbiddenException({}, 'error.invalidCoordinates');
 
     this.state[coordinates.row][coordinates.col] = side;
+    this.turnOf = gameUtils.toggleFieldValue(this.turnOf);
+    this.counter[this.turnOf]++;
   }
 }

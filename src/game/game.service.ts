@@ -70,6 +70,8 @@ export class GameService {
 
     const game = Game.loadGameFromState(gameEntity, gameEntity.state);
     game.playerMove(playerSide, coordinates);
+    game.makeMoveIfNeeded();
+
     gameEntity.state = game.getState();
     await this.gameSaver.saveGame(gameEntity);
     return gameEntity;
