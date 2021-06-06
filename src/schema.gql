@@ -32,5 +32,5 @@ input GameCoordinatesDto {
 }
 
 type Subscription {
-  gameInitialized(id: String!): ReadGameDto!
+  gameModified(player: String!, id: String!): ReadGameDto!
 }

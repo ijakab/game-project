@@ -41,7 +41,9 @@ export class GameResolver {
     @Args({ name: 'coordinates', type: () => GameCoordinatesDto })
     dto: GameCoordinatesDto,
   ): Promise<ReadGameDto> {
-    return this.gameService.makeMove(gameId, player, dto);
+    const data = await this.gameService.makeMove(gameId, player, dto);
+    pubSub.publish('gameModified', { gameModified: data }).catch(console.error);
+    return data;
   }
 
   @Mutation((returns) => ReadGameDto)
@@ -53,13 +55,15 @@ export class GameResolver {
   }
 
   @Subscription((returns) => ReadGameDto, {
-    name: 'gameInitialized',
+    name: 'gameModified',
     filter: (payload, variables) => {
-      // we should also check that the user is on the game, but no authentication was built anyway
-      return payload.gameInitialized.id === variables.id;
+      return payload.gameModified.id === variables.id &&
+        (payload.gameModified.player_one === variables.player ||
+          payload.gameModified.player_two === variables.player
+        );
     },
   })
-  gameInitialized(@Args('id') id: string) {
-    return pubSub.asyncIterator('gameInitialized');
+  gameModified(@Args('id') id: string, @Args('player') player: string) {
+    return pubSub.asyncIterator('gameModified');
   }
 }
