@@ -43,9 +43,18 @@ export class GameResolver {
     return this.gameService.initGame({ play_as: FieldValue.O, type: GameType.Multi }, player);
   }
 
+  @Mutation((returns) => ReadGameDto)
+  async joinGame(
+    @Args({ name: 'player', type: () => GraphQLString }) player: string,
+    @Args({ name: 'game_id', type: () => GraphQLString }) gameId: string,
+  ): Promise<ReadGameDto> {
+    return this.gameService.joinGame(gameId, player);
+  }
+
   @Subscription((returns) => ReadGameDto, {
     name: 'gameInitialized',
     filter: (payload, variables) => {
+      // we should also check that the user is on the game, but no authentication was built anyway
       return payload.gameInitialized.id === variables.id;
     },
   })

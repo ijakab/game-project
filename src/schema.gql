@@ -18,6 +18,7 @@ type Query {
 type Mutation {
   initGame(player: String!, config: SaveGameDto!): ReadGameDto!
   makeMove(player: String!, coordinates: GameCoordinatesDto!): ReadGameDto!
+  joinGame(game_id: String!, player: String!): ReadGameDto!
 }
 
 input SaveGameDto {
