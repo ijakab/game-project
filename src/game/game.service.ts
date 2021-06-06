@@ -4,9 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ReadGameDto } from './dto/read-game.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { GameEntity } from './game.entity';
-import { Repository } from 'typeorm';
 import { Game } from './logic/game';
 import { SaveGameDto } from './dto/save-game.dto';
 import { validateOrReject } from 'class-validator';
@@ -14,13 +11,16 @@ import { plainToClass } from 'class-transformer';
 import { GameType } from './enum/game-type.enum';
 import { GameCoordinatesDto } from './dto/game-coordinates.dto';
 import { FieldValue } from './enum/field-value.enum';
+import { DatabaseGameSaver } from './savers/database.game-saver';
+import { GameSaver } from './savers/game-saver.interface';
 
 @Injectable()
 export class GameService {
-  constructor(
-    @InjectRepository(GameEntity)
-    private gameRepository: Repository<GameEntity>,
-  ) {}
+  private readonly gameSaver: GameSaver;
+
+  constructor(private dbGameSaver: DatabaseGameSaver) {
+    this.gameSaver = dbGameSaver;
+  }
 
   async initGame(dto: SaveGameDto, player: string): Promise<ReadGameDto> {
     // Validation does not get applied on graphql, so calling it manually
@@ -36,26 +36,25 @@ export class GameService {
     const game = Game.getEmptyGame(config);
     game.makeMoveIfNeeded();
 
-    const gameEntity = await this.gameRepository.create({
+    const gameEntity = await this.gameSaver.saveGame({
       ...config,
       state: game.getState(),
     });
-    await this.gameRepository.save(gameEntity);
     return gameEntity;
   }
 
   async joinGame(gameId: string, player: string): Promise<ReadGameDto> {
-    const game = await this.gameRepository.findOne({ id: gameId });
+    const game = await this.gameSaver.fetchGame(gameId);
 
     // these error handlers could be made to translate error messages
-    if (!game) throw new NotFoundException({ gameId }, `error.gameExists`);
+    if (!game) throw new NotFoundException({ message: 'error.gameExists' });
     if (game.type === GameType.Single)
-      throw new ForbiddenException({ gameId }, 'error.singlePlayers');
+      throw new ForbiddenException({ message: 'error.singlePlayers' });
     if (game.player_two)
-      throw new ForbiddenException({ gameId }, 'error.alreadyJoined');
+      throw new ForbiddenException({ message: 'error.alreadyJoined' });
 
     game.player_two = player;
-    await this.gameRepository.save(game);
+    await this.gameSaver.saveGame(game);
     return game;
   }
 
@@ -64,7 +63,7 @@ export class GameService {
     player: string,
     coordinates: GameCoordinatesDto,
   ): Promise<ReadGameDto> {
-    const gameEntity = await this.gameRepository.findOne({ id: gameId });
+    const gameEntity = await this.gameSaver.fetchGame(gameId);
     if (gameEntity.player_one !== player && gameEntity.player_two !== player)
       throw new ForbiddenException({ gameId }, 'error.notInTheGame');
     const playerSide = this.getPlayerSide(player, gameEntity);
@@ -72,7 +71,7 @@ export class GameService {
     const game = Game.loadGameFromState(gameEntity, gameEntity.state);
     game.playerMove(playerSide, coordinates);
     gameEntity.state = game.getState();
-    await this.gameRepository.save(gameEntity);
+    await this.gameSaver.saveGame(gameEntity);
     return gameEntity;
   }
 
