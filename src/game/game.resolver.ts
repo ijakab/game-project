@@ -40,7 +40,10 @@ export class GameResolver {
     dto: GameCoordinatesDto,
     @Args({ name: 'player', type: () => GraphQLString }) player: string,
   ): Promise<ReadGameDto> {
-    return this.gameService.initGame({ play_as: FieldValue.O, type: GameType.Multi }, player);
+    return this.gameService.initGame(
+      { play_as: FieldValue.O, type: GameType.Multi },
+      player,
+    );
   }
 
   @Mutation((returns) => ReadGameDto)
