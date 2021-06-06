@@ -17,11 +17,17 @@ type Query {
 
 type Mutation {
   initGame(player: String!, config: SaveGameDto!): ReadGameDto!
+  makeMove(player: String!, coordinates: GameCoordinatesDto!): ReadGameDto!
 }
 
 input SaveGameDto {
   type: String!
   play_as: String!
+}
+
+input GameCoordinatesDto {
+  row: Float!
+  col: Float!
 }
 
 type Subscription {

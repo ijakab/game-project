@@ -6,6 +6,7 @@ import { GameType } from './enum/game-type.enum';
 import { SaveGameDto } from './dto/save-game.dto';
 import { PubSub } from 'graphql-subscriptions';
 import { GraphQLString } from 'graphql';
+import { GameCoordinatesDto } from './dto/game-coordinates.dto';
 
 const pubSub = new PubSub();
 
@@ -27,13 +28,19 @@ export class GameResolver {
 
   @Mutation((returns) => ReadGameDto)
   async initGame(
-    @Args({ name: 'config', type: () => SaveGameDto }) dto: ReadGameDto,
+    @Args({ name: 'config', type: () => SaveGameDto }) dto: SaveGameDto,
     @Args({ name: 'player', type: () => GraphQLString }) player: string,
   ): Promise<ReadGameDto> {
-    const res = await this.gameService.initGame(dto, player);
-    await pubSub.publish('gameInitialized', { gameInitialized: res });
-    console.log(res);
-    return res;
+    return this.gameService.initGame(dto, player);
+  }
+
+  @Mutation((returns) => ReadGameDto)
+  async makeMove(
+    @Args({ name: 'coordinates', type: () => GameCoordinatesDto })
+    dto: GameCoordinatesDto,
+    @Args({ name: 'player', type: () => GraphQLString }) player: string,
+  ): Promise<ReadGameDto> {
+    return this.gameService.initGame({ play_as: FieldValue.O, type: GameType.Multi }, player);
   }
 
   @Subscription((returns) => ReadGameDto, {
