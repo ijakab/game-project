@@ -36,14 +36,12 @@ export class GameResolver {
 
   @Mutation((returns) => ReadGameDto)
   async makeMove(
+    @Args({ name: 'player', type: () => GraphQLString }) player: string,
+    @Args({ name: 'game_id', type: () => GraphQLString }) gameId: string,
     @Args({ name: 'coordinates', type: () => GameCoordinatesDto })
     dto: GameCoordinatesDto,
-    @Args({ name: 'player', type: () => GraphQLString }) player: string,
   ): Promise<ReadGameDto> {
-    return this.gameService.initGame(
-      { play_as: FieldValue.O, type: GameType.Multi },
-      player,
-    );
+    return this.gameService.makeMove(gameId, player, dto);
   }
 
   @Mutation((returns) => ReadGameDto)

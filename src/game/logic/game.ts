@@ -3,6 +3,8 @@ import { GameType } from '../enum/game-type.enum';
 import { FieldValue } from '../enum/field-value.enum';
 import { AI } from './ai/ai.interface';
 import { RandomAi } from './ai/random.ai';
+import { GameCoordinatesDto } from '../dto/game-coordinates.dto';
+import { ForbiddenException } from '@nestjs/common';
 
 export class Game {
   private ai: AI = new RandomAi();
@@ -17,13 +19,20 @@ export class Game {
     [FieldValue.Empty, FieldValue.Empty, FieldValue.Empty],
   ];
 
-  static getEmptyGame(config: GameConfig) {
-    return new Game(config);
+  public static getEmptyGame(config: GameConfig): Game {
+    const game = new Game(config);
+    game.calculateInitialValues();
+    return game;
   }
 
-  constructor(private config: GameConfig) {
-    this.calculateInitialValues();
+  public static loadGameFromState(config: GameConfig, state: GameState): Game {
+    const game = new Game(config);
+    game.state = state; // todo deep clone
+    game.calculateInitialValues();
+    return game;
   }
+
+  constructor(private config: GameConfig) {}
 
   private calculateInitialValues() {
     if (this.config.type === GameType.Multi) {
@@ -41,7 +50,7 @@ export class Game {
 
   private iterateOverState(callback) {
     for (const row of this.state) {
-      for (const col of this.state) {
+      for (const col of row) {
         callback(col);
       }
     }
@@ -60,5 +69,15 @@ export class Game {
   public makeMove(): void {
     const position = this.ai.getMove(this.getState(), this.gamePlaysAs);
     this.state[position.row][position.col] = this.gamePlaysAs;
+  }
+
+  public playerMove(side: FieldValue, coordinates: GameCoordinatesDto): void {
+    if (side !== this.turnOf)
+      throw new ForbiddenException({}, 'error.notYourTurn');
+    const currentValue = this.state[coordinates.row][coordinates.col];
+    if (currentValue !== FieldValue.Empty)
+      throw new ForbiddenException({}, 'error.invalidCoordinates');
+
+    this.state[coordinates.row][coordinates.col] = side;
   }
 }
