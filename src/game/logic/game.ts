@@ -20,6 +20,6 @@ export class Game {
   }
 
   public makeMoveIfNeeded(): void {
-    if (this.config.type === GameType.Single) return
+    if (this.config.type === GameType.Single) return;
   }
 }
