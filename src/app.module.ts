@@ -5,6 +5,7 @@ import { GameModule } from './game/game.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
+import { LoggingPlugin } from './plugins/logging.plugin';
 
 @Module({
   imports: [
@@ -26,6 +27,6 @@ import { join } from 'path';
     GameModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, LoggingPlugin],
 })
 export class AppModule {}

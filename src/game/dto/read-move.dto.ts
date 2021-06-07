@@ -7,7 +7,7 @@ export class ReadMoveDto {
   @Field()
   id: string;
 
-  @Field({nullable: true})
+  @Field({ nullable: true })
   player?: string;
 
   @Field()
