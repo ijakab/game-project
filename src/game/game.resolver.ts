@@ -7,6 +7,7 @@ import { SaveGameDto } from './dto/save-game.dto';
 import { PubSub } from 'graphql-subscriptions';
 import { GraphQLString } from 'graphql';
 import { SaveGameCoordinatesDto } from './dto/save-game-coordinates.dto';
+import { ReadMoveDto } from './dto/read-move.dto';
 
 const pubSub = new PubSub();
 
@@ -14,16 +15,9 @@ const pubSub = new PubSub();
 export class GameResolver {
   constructor(private gameService: GameService) {}
 
-  @Query((returns) => ReadGameDto)
-  getGame(@Args('id') id: string): ReadGameDto {
-    return {
-      id: 'test',
-      play_as: FieldValue.O,
-      type: GameType.Multi,
-      state: [],
-      player_one: 'test1',
-      player_two: 'test2',
-    };
+  @Query((returns) => [ReadMoveDto])
+  getHistory(@Args('game_id') gameId: string): Promise<ReadMoveDto[]> {
+    return this.gameService.getHistory(gameId);
   }
 
   @Mutation((returns) => ReadGameDto)

@@ -13,6 +13,7 @@ import { SaveGameCoordinatesDto } from './dto/save-game-coordinates.dto';
 import { FieldValue } from './enum/field-value.enum';
 import { DatabaseGameSaver } from './savers/database.game-saver';
 import { GameSaver } from './savers/game-saver.interface';
+import { ReadMoveDto } from './dto/read-move.dto';
 
 @Injectable()
 export class GameService {
@@ -91,6 +92,10 @@ export class GameService {
     gameEntity.won_by = game.wonBy();
     await this.gameSaver.saveGame(gameEntity);
     return gameEntity;
+  }
+
+  async getHistory(gameId: string): Promise<ReadMoveDto[]> {
+    return this.gameSaver.fetchMoves(gameId);
   }
 
   private getPlayerSide(player: string, game: ReadGameDto) {

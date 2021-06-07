@@ -33,4 +33,11 @@ export class DatabaseGameSaver implements GameSaver {
   async fetchGame(id: string): Promise<ReadGameDto> {
     return this.gameRepository.findOne({ id });
   }
+
+  async fetchMoves(gameId: string): Promise<MoveEntity[]> {
+    return this.moveRepository.createQueryBuilder('move')
+      .where('"gameId" = :gameId', { gameId })
+      .orderBy('move.created_at')
+      .getMany();
+  }
 }
