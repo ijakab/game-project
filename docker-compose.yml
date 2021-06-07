@@ -12,8 +12,20 @@ services:
     ports:
       - 5432:5432
 
+  app_game:
+    build: .
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    depends_on:
+      - postgres_game
+    ports:
+      - 3000:3000
+    env_file:
+      - dockerEnvironment.env
+
 #  In production, we would need something like redis as we might have more then a single instance of process
-#  However it is not configured for this app
+#  However it is not configured for this app, as I did not find option to write subscription data to redis in docs
 #  redis_game:
 #    image: redis:6-alpine
 #    container_name: redis_game
@@ -23,5 +35,5 @@ services:
 #      - 6379:6379
 
 volumes:
-  redis_game_volume:
+#  redis_game_volume:
   postgres_game_volume:
