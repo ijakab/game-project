@@ -22,14 +22,14 @@ export class GameEntity {
   player_one: string;
 
   @Column({ nullable: true })
-  player_two: string;
+  player_two?: string;
 
   @Column({ nullable: true, default: false })
-  is_over: boolean;
+  is_over?: boolean;
 
   @Column({ nullable: true })
-  won_by: FieldValue;
+  won_by?: FieldValue;
 
   @OneToMany((type) => MoveEntity, (move) => move.game)
-  moves: MoveEntity[];
+  moves?: MoveEntity[];
 }
