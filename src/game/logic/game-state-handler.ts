@@ -14,11 +14,9 @@ export class GameStateHandler {
   };
 
   constructor(private state: GameState) {
-    this.iterateOverState((value) => {
-      if (value !== FieldValue.Empty) {
-        this.counter[value]++;
-      }
-    });
+    for (const value of this.iterateOverState()) {
+      this.counter[value]++;
+    }
     this.turnOf =
       this.counter[FieldValue.X] <= this.counter[FieldValue.O]
         ? FieldValue.X
@@ -60,11 +58,10 @@ export class GameStateHandler {
   }
 
   public isFull() {
-    let full = true;
-    this.iterateOverState(val => {
-      if (val) full = false;
-    });
-    return full;
+    for (const val of this.iterateOverState()) {
+      if (!val) return false;
+    }
+    return true;
   }
 
   public isWinningMove(coordinates: SaveGameCoordinatesDto, side: FieldValue): boolean {
@@ -82,11 +79,10 @@ export class GameStateHandler {
     return false;
   }
 
-  private iterateOverState(callback) {
-    // todo refactor to generator
+  private *iterateOverState() {
     for (const row of this.state) {
       for (const col of row) {
-        callback(col);
+        yield col;
       }
     }
   }
