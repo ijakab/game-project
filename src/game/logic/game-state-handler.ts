@@ -1,7 +1,7 @@
 import { GameState } from '../types';
 import { FieldValue } from '../enum/field-value.enum';
 import { cloneDeep } from 'lodash';
-import { GameCoordinatesDto } from '../dto/game-coordinates.dto';
+import { SaveGameCoordinatesDto } from '../dto/save-game-coordinates.dto';
 import { gameUtils } from '../utils';
 
 export class GameStateHandler {
@@ -42,7 +42,7 @@ export class GameStateHandler {
     return cloneDeep(this.state);
   }
 
-  public setValue(coordinates: GameCoordinatesDto, value: FieldValue) {
+  public setValue(coordinates: SaveGameCoordinatesDto, value: FieldValue) {
     this.state[coordinates.row][coordinates.col] = value;
     this.counter[this.turnOf]++;
 
@@ -55,7 +55,7 @@ export class GameStateHandler {
     this.turnOf = gameUtils.toggleFieldValue(this.turnOf);
   }
 
-  public getValue(coordinates: GameCoordinatesDto) {
+  public getValue(coordinates: SaveGameCoordinatesDto) {
     return this.state[coordinates.row][coordinates.col];
   }
 
@@ -67,7 +67,7 @@ export class GameStateHandler {
     return full;
   }
 
-  public isWinningMove(coordinates: GameCoordinatesDto, side: FieldValue): boolean {
+  public isWinningMove(coordinates: SaveGameCoordinatesDto, side: FieldValue): boolean {
     const valuesInRow = this.state[coordinates.row].filter((v) => v === side);
     const valuesInCol = this.state.map((row) => row[coordinates.col]).filter(v => v === side);
     if (valuesInRow.length === this.state.length || valuesInCol.length === this.state.length) return true;

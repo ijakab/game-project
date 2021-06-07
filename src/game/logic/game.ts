@@ -1,12 +1,13 @@
-import { GameConfig, GameState } from '../types';
+import { GameConfig, GameState, MinimalMove } from '../types';
 import { GameType } from '../enum/game-type.enum';
 import { FieldValue } from '../enum/field-value.enum';
 import { AI } from './ai/ai.interface';
 import { RandomAi } from './ai/random.ai';
-import { GameCoordinatesDto } from '../dto/game-coordinates.dto';
+import { SaveGameCoordinatesDto } from '../dto/save-game-coordinates.dto';
 import { ForbiddenException } from '@nestjs/common';
 import { gameUtils } from '../utils';
 import { GameStateHandler } from './game-state-handler';
+import { ReadMoveDto } from '../dto/read-move.dto';
 
 export class Game {
   private ai: AI = new RandomAi();
@@ -38,21 +39,28 @@ export class Game {
     return this.stateHandler.getState();
   }
 
-  public makeMoveIfNeeded(): void {
-    if (this.stateHandler.isOver) return;
-    if (this.gamePlaysAs !== this.stateHandler.turnOf) return;
-    this.makeMove();
+  public makeMoveIfNeeded(): MinimalMove {
+    if (this.stateHandler.isOver) return null;
+    if (this.gamePlaysAs !== this.stateHandler.turnOf) return null;
+    return this.makeMove();
   }
 
-  public makeMove(): void {
-    const position = this.ai.getMove(
+  public makeMove(): MinimalMove {
+    const coordinates = this.ai.getMove(
       this.stateHandler.getState(),
       this.gamePlaysAs,
     );
-    this.stateHandler.setValue(position, this.gamePlaysAs);
+    this.stateHandler.setValue(coordinates, this.gamePlaysAs);
+    return {
+      coordinates,
+      value: this.gamePlaysAs,
+    };
   }
 
-  public playerMove(side: FieldValue, coordinates: GameCoordinatesDto): void {
+  public playerMove(
+    side: FieldValue,
+    coordinates: SaveGameCoordinatesDto,
+  ): MinimalMove {
     if (this.stateHandler.isOver) throw new ForbiddenException({ message: 'error.gameOver' });
     if (side !== this.stateHandler.turnOf)
       throw new ForbiddenException({ message: 'error.notYourTurn' });
@@ -61,6 +69,11 @@ export class Game {
       throw new ForbiddenException({ message: 'error.invalidCoordinates' });
 
     this.stateHandler.setValue(coordinates, side);
+
+    return {
+      coordinates,
+      value: side,
+    };
   }
 
   public wonBy(): FieldValue {

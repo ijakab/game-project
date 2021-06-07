@@ -1,7 +1,7 @@
 import { GameState } from '../../types';
 import { FieldValue } from '../../enum/field-value.enum';
-import { GameCoordinatesDto } from '../../dto/game-coordinates.dto';
+import { SaveGameCoordinatesDto } from '../../dto/save-game-coordinates.dto';
 
 export interface AI {
-  getMove(state: GameState, playAs: FieldValue): GameCoordinatesDto;
+  getMove(state: GameState, playAs: FieldValue): SaveGameCoordinatesDto;
 }

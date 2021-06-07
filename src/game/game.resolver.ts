@@ -6,7 +6,7 @@ import { GameType } from './enum/game-type.enum';
 import { SaveGameDto } from './dto/save-game.dto';
 import { PubSub } from 'graphql-subscriptions';
 import { GraphQLString } from 'graphql';
-import { GameCoordinatesDto } from './dto/game-coordinates.dto';
+import { SaveGameCoordinatesDto } from './dto/save-game-coordinates.dto';
 
 const pubSub = new PubSub();
 
@@ -38,8 +38,8 @@ export class GameResolver {
   async makeMove(
     @Args({ name: 'player', type: () => GraphQLString }) player: string,
     @Args({ name: 'game_id', type: () => GraphQLString }) gameId: string,
-    @Args({ name: 'coordinates', type: () => GameCoordinatesDto })
-    dto: GameCoordinatesDto,
+    @Args({ name: 'coordinates', type: () => SaveGameCoordinatesDto })
+    dto: SaveGameCoordinatesDto,
   ): Promise<ReadGameDto> {
     const data = await this.gameService.makeMove(gameId, player, dto);
     pubSub.publish('gameModified', { gameModified: data }).catch(console.error);

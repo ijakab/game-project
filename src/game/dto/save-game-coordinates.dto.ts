@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
-export class GameCoordinatesDto {
+export class SaveGameCoordinatesDto {
   @Field()
   row: number;
 

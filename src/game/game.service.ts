@@ -9,7 +9,7 @@ import { SaveGameDto } from './dto/save-game.dto';
 import { validateOrReject } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { GameType } from './enum/game-type.enum';
-import { GameCoordinatesDto } from './dto/game-coordinates.dto';
+import { SaveGameCoordinatesDto } from './dto/save-game-coordinates.dto';
 import { FieldValue } from './enum/field-value.enum';
 import { DatabaseGameSaver } from './savers/database.game-saver';
 import { GameSaver } from './savers/game-saver.interface';
@@ -34,12 +34,19 @@ export class GameService {
       player_one: player,
     };
     const game = Game.getEmptyGame(config);
-    game.makeMoveIfNeeded();
-
+    const gameMove = game.makeMoveIfNeeded();
     const gameEntity = await this.gameSaver.saveGame({
       ...config,
       state: game.getState(),
     });
+
+    if (gameMove)
+      await this.gameSaver.saveMove({
+        ...gameMove,
+        player: null,
+        gameId: gameEntity.id,
+      });
+
     return gameEntity;
   }
 
@@ -61,7 +68,7 @@ export class GameService {
   async makeMove(
     gameId: string,
     player: string,
-    coordinates: GameCoordinatesDto,
+    coordinates: SaveGameCoordinatesDto,
   ): Promise<ReadGameDto> {
     const gameEntity = await this.gameSaver.fetchGame(gameId);
     if (gameEntity.player_one !== player && gameEntity.player_two !== player)
@@ -69,8 +76,15 @@ export class GameService {
     const playerSide = this.getPlayerSide(player, gameEntity);
 
     const game = Game.loadGameFromState(gameEntity, gameEntity.state);
-    game.playerMove(playerSide, coordinates);
-    game.makeMoveIfNeeded();
+    const playerMove = game.playerMove(playerSide, coordinates);
+    await this.gameSaver.saveMove({ ...playerMove, player, gameId: gameId });
+    const gameMove = game.makeMoveIfNeeded();
+    if (gameMove)
+      await this.gameSaver.saveMove({
+        ...gameMove,
+        player: null,
+        gameId: gameId,
+      });
 
     gameEntity.state = game.getState();
     gameEntity.is_over = game.isOver();

@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { GameType } from './enum/game-type.enum';
-import { FieldValue } from './enum/field-value.enum';
-import { GameState } from './types';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { GameType } from '../enum/game-type.enum';
+import { FieldValue } from '../enum/field-value.enum';
+import { GameState } from '../types';
+import { MoveEntity } from './move.entity';
 
 @Entity()
 export class GameEntity {
@@ -28,4 +29,7 @@ export class GameEntity {
 
   @Column({ nullable: true })
   won_by: FieldValue;
+
+  @OneToMany((type) => MoveEntity, (move) => move.game)
+  moves: MoveEntity[];
 }

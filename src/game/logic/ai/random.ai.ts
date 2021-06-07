@@ -1,11 +1,11 @@
 import { AI } from './ai.interface';
 import { GameState } from '../../types';
 import { FieldValue } from '../../enum/field-value.enum';
-import { GameCoordinatesDto } from '../../dto/game-coordinates.dto';
+import { SaveGameCoordinatesDto } from '../../dto/save-game-coordinates.dto';
 
 export class RandomAi implements AI {
-  public getMove(state: GameState, playAs: FieldValue): GameCoordinatesDto {
-    const emptyCombinations: GameCoordinatesDto[] = [];
+  public getMove(state: GameState, playAs: FieldValue): SaveGameCoordinatesDto {
+    const emptyCombinations: SaveGameCoordinatesDto[] = [];
     for (let i = 0; i < state.length; i++) {
       for (let j = 0; j < state[i].length; j++) {
         if (!state[i][j]) emptyCombinations.push({ row: i, col: j });
