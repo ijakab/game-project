@@ -37,3 +37,10 @@ The manual way:
 - Using game stateful logic classes not dependent on DI and execution context
 - Using DI services as a core of integrators of execution flow, connecting requests with game logic and game stores
 - Using resolvers as a graphql endpoints with minimal logic in them
+
+## Notes
+
+- There is no authentication system, players are just represented with string arguments
+- AI moves at random, but ai strategy is easily switchable in code structure
+- Redis is prepared in docker-compose and probably should be used in this kind of project, as we may have multiple instances running. However, docs do not specify a way to save subscription data to Redis
+- Could not find specification how to add custom logic in validation phase of graphql on nest documentation, so used class validators instead
