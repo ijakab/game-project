@@ -3,7 +3,6 @@ import { ReadGameDto } from './dto/read-game.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { GameType } from './enum/game-type.enum';
 import { plainToClass } from 'class-transformer';
-import { SaveGameDto } from './dto/save-game.dto';
 import { validateOrReject } from 'class-validator';
 
 export const gameUtils = {
