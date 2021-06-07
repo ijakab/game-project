@@ -1,7 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ReadGameDto } from './dto/read-game.dto';
 import { Game } from './logic/game';
 import { SaveGameDto } from './dto/save-game.dto';
@@ -81,6 +78,5 @@ export class GameService {
     gameEntity.is_over = game.isOver();
     gameEntity.won_by = game.wonBy();
     await this.gameSaver.saveGame(gameEntity);
-
   }
 }
